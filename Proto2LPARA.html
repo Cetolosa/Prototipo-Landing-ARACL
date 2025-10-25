@@ -1,0 +1,1359 @@
+html
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Portal Corporativo Aramark</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+        z-index: 1000;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        padding: 4px 15px;
+        align-items: center;
+        gap: 8px;
+        overflow-x: auto;
+        min-height: 40px;
+    }
+
+    #area-cards-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 8px;
+        overflow-x: auto;
+    }
+
+    /* NUEVO: Ícono MA flotante */
+    #sitemap-button {
+        position: fixed;
+        top: 8px;
+        left: 0;
+        z-index: 1001;
+        cursor: pointer;
+    }
+
+    #sitemap-button img {
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    #sitemap-button img:hover {
+        transform: scale(1.1);
+    }
+
+    #sitemap-button:hover {
+        background-color: #005a9e;
+        transform: scale(1.1);
+    }
+
+    #admin-button {
+        position: fixed;
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #0078d4;
+        transition: color 0.2s;
+        z-index: 1001;
+    }
+
+    #admin-button:hover {
+        color: #005a9e;
+    }
+
+    .area-card {
+        margin: 0;
+        padding: 6px 12px;
+        background-color: #EB2034;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        font-size: 0.85rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        white-space: nowrap;
+        flex-shrink: 0;
+        min-width: 100px;
+    }
+
+    .area-card:hover {
+        background-color: #c91829;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .area-card.active {
+        background-color: #211F20;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero {
+        height: 400px;
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://user-gen-media-assets.s3.amazonaws.com/seedream_images/c7132b31-92fa-4fcc-9c12-8062bd1bc719.png') center / cover no-repeat;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+        margin-top: 45px;
+        position: relative;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        margin: 0;
+    }
+
+    .hero p {
+        font-size: 1.5rem;
+        margin-top: 10px;
+    }
+
+    /* MODIFICADO: Barra inferior fija para botones hero */
+    .hero-buttons {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #fff;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 15px;
+        flex-wrap: nowrap;
+    }
+
+    .hero-buttons .logo-aramark {
+        height: 30px;
+        width: 120px;
+        margin-right: 15px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .hero button {
+        background-color: #EB2034;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.2s;
+        white-space: nowrap;
+    }
+
+    .hero button:hover {
+        background-color: #c91829;
+        transform: scale(1.05);
+    }
+
+    .main-content {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        padding-bottom: 60px; /* Espacio para barra inferior fija */
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .area-content {
+        display: none;
+    }
+
+    .area-content.active {
+        display: block;
+    }
+
+    .subcats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .subcat {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+        overflow: hidden;
+    }
+
+    .subcat-image {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+    }
+
+    .subcat-header {
+        background-color: #EB2034;
+        color: white;
+        padding: 12px;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .subcat-header:hover {
+        background-color: #c91829;
+    }
+
+    .subcat-content {
+        padding: 15px;
+        display: none;
+    }
+
+    .subcat-content.visible {
+        display: block;
+    }
+
+    .func {
+        margin-bottom: 15px;
+    }
+
+    .func-header {
+        background-color: #f0f0f0;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-weight: bold;
+        border-left: 3px solid #EB2034;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .func-header:hover {
+        background-color: #e0e0e0;
+    }
+
+    .func-content {
+        padding: 10px 0 10px 15px;
+        display: none;
+    }
+
+    .func-content.visible {
+        display: block;
+    }
+
+    .app-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .app-list li {
+        padding: 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .app-list a {
+        color: #EB2034;
+        text-decoration: none;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .app-list a:hover {
+        text-decoration: underline;
+    }
+
+    .app-icon {
+        width: 22px;
+        height: 22px;
+        object-fit: contain;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 50px auto;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 800px;
+        position: relative;
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 28px;
+        cursor: pointer;
+        color: #999;
+    }
+
+    .close-modal:hover {
+        color: #333;
+    }
+
+    #admin-content label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    #admin-content input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    #admin-content button {
+        margin-top: 15px;
+        margin-right: 10px;
+        padding: 10px 20px;
+        background-color: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #admin-content button:hover {
+        background-color: #005a9e;
+    }
+
+    .tree ul {
+        list-style: none;
+        padding-left: 20px;
+    }
+
+    .tree li {
+        margin: 5px 0;
+    }
+
+    .tree a {
+        color: #EB2034;
+        text-decoration: none;
+    }
+
+    .tree a:hover {
+        text-decoration: underline;
+    }
+
+    .tree ul.collapsible {
+        display: none;
+    }
+
+    .tree ul.collapsible.visible {
+        display: block;
+    }
+
+    #search-results {
+        background-color: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        display: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+    }
+
+    #search-results ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    #search-results li {
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    #search-results a {
+        color: #EB2034;
+        text-decoration: none;
+    }
+
+    #search-results a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .hero h1 {
+            font-size: 2rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+        }
+
+        .subcats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .subcat-image {
+            height: 120px;
+        }
+
+        .app-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* NUEVO: Ajustes responsive */
+        #sitemap-button {
+            width: 40px;
+            height: 40px;
+            font-size: 14px;
+            top: 15px;
+            left: 15px;
+        }
+
+        .hero button {
+            font-size: 0.9rem;
+            padding: 8px 15px;
+        }
+
+        .hero-buttons {
+            gap: 8px;
+            padding: 10px;
+        }
+    }
+</style>
+<style>
+    .panel-container {
+        display: flex;
+        gap: 20px;
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+
+    .panel {
+        flex: 1;
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    }
+
+    .panel h2 {
+        color: #EB2034;
+        margin-top: 0;
+    }
+</style>
+<style>
+    #modalFavoritos .modal-content,
+    #modalUltimos .modal-content {
+        max-width: 600px;
+    }
+
+    #modalFavoritos ul,
+    #modalUltimos ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    #modalFavoritos li,
+    #modalUltimos li {
+        padding: 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    #modalFavoritos a,
+    #modalUltimos a {
+        color: #EB2034;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #modalFavoritos a:hover,
+    #modalUltimos a:hover {
+        text-decoration: underline;
+    }
+</style>
+<style>
+    .cards-wrapper {
+        display: flex;
+        gap: 20px;
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+        flex-wrap: wrap;
+    }
+
+    .info-card {
+        flex: 1;
+        min-width: 280px;
+        max-width: 50%;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,.1);
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .info-card-image {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .info-card-footer {
+        background-color: #003d6b;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+        .cards-wrapper {
+            flex-direction: column;
+        }
+
+        .info-card {
+            max-width: 100%;
+        }
+    }
+</style>
+<style>
+    .btn-text-short {
+        display: none;
+    }
+
+    /* Responsive: Textos cortos en mobile */
+    @media (max-width: 768px) {
+        header {
+            padding: 3px 10px;
+            min-height: 35px;
+            gap: 6px;
+        }
+        
+        .area-card {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            min-width: 70px;
+        }
+        
+        #sitemap-button img {
+            width: 24px;
+            height: 24px;
+        }
+        
+        #admin-button {
+            font-size: 20px;
+            right: 6px;
+            top: 6px;
+        }
+
+        .hero {
+            height: 250px;
+            margin-top: 38px;
+        }
+
+        .hero h1 {
+            font-size: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1rem;
+        }
+
+        .hero-buttons {
+            padding: 4px 10px;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .hero-buttons .logo-aramark {
+            height: 20px;
+            width: 80px;
+            margin-right: 8px;
+        }
+        
+        .hero button {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+        }
+
+        .btn-text-full {
+            display: none;
+        }
+
+        .btn-text-short {
+            display: inline;
+        }
+
+        .subcat-image {
+            height: 100px;
+        }
+    }
+</style>
+</head>
+<body>
+<header id="header">
+    <div id="sitemap-button" onclick="App.ui.showSitemap()">
+        <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/22ce8857-79c5-498d-b0ad-a80fe9b370a5.png" alt="MA" style="width: 28px; height: 28px; cursor: pointer;">
+    </div>
+    <div id="area-cards-container"></div>
+    <div id="admin-button" onclick="App.ui.showAdminModal()">⚙️</div>
+</header>
+<section class="hero">
+    <h1>Portal Operativo Aramark</h1>
+    <p>Acceso rápido a todas tus herramientas corporativas</p>
+    <div class="hero-buttons">
+        <svg class="logo-aramark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="120" height="30">
+            <text x="10" y="35" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#EB2034">ARAMARK</text>
+        </svg>
+        <button id="btnTutoriales">
+            <span class="btn-text-full">Ver siempre tutoriales</span>
+            <span class="btn-text-short">Tutoriales</span>
+        </button>
+        <button id="btnFavoritos">
+            <span class="btn-text-full">Favoritos</span>
+            <span class="btn-text-short">Favoritos</span>
+        </button>
+        <button id="btnUltimos">
+            <span class="btn-text-full">10 últimos seleccionados</span>
+            <span class="btn-text-short">Últimos</span>
+        </button>
+    </div>
+</section>
+<div class="main-content">
+    <input class="search-input" id="search-input" placeholder="Buscar aplicaciones..." type="text"/>
+    <div id="search-results"></div>
+    <div id="areas-container"></div>
+</div>
+<div class="modal" id="admin-modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="App.ui.closeAdminModal()">×</span>
+        <h2>Panel de Administración</h2>
+        <div id="admin-content">
+            <label>Nivel 1 (Área):</label>
+            <input id="level1" type="text"/>
+            <label>Nivel 2 (Subcategoría):</label>
+            <input id="level2" type="text"/>
+            <label>Imagen Nivel 2 (URL):</label>
+            <input id="level2img" type="text"/>
+            <label>Nivel 3 (Función):</label>
+            <input id="level3" type="text"/>
+            <label>Nombre Aplicación:</label>
+            <input id="appname" type="text"/>
+            <label>URL Aplicación:</label>
+            <input id="appurl" type="text"/>
+            <label>Ícono Aplicación (URL):</label>
+            <input id="appicon" type="text"/>
+            <label>Tutorial URL (opcional):</label>
+            <input id="apptutorial" type="text"/>
+            <button onclick="App.admin.addEntry()">Guardar</button>
+            <button onclick="App.admin.deleteEntry()">Eliminar</button>
+            <button onclick="App.admin.importStructure()">Importar Excel</button>
+            <button onclick="App.admin.exportStructure()">Exportar Excel</button>
+            <input accept=".xlsx,.xls" id="file-input" style="display:none" type="file"/>
+        </div>
+    </div>
+</div>
+<div class="modal" id="sitemap-modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="App.ui.closeSitemap()">×</span>
+        <h2>Mapa de Aplicaciones</h2>
+        <button onclick="App.sitemap.expandAll()">Expandir todo</button>
+        <button onclick="App.sitemap.collapseAll()">Contraer todo</button>
+        <div class="tree" id="sitemap-tree"></div>
+    </div>
+</div>
+<div class="modal" id="modalFavoritos">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('modalFavoritos').style.display='none'">×</span>
+        <h2>Favoritos</h2>
+        <ul id="favoritos-list"></ul>
+    </div>
+</div>
+<div class="modal" id="modalUltimos">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('modalUltimos').style.display='none'">×</span>
+        <h2>10 últimos seleccionados</h2>
+        <ul>
+            <li><a href="https://www.visitappyauditoriaoperacional.com/" target="_blank">VisitAPP y Auditoria Operacional</a></li>
+            <li><a href="https://www.apphaberesvariables.com/" target="_blank">APP Haberes variables</a></li>
+            <li><a href="https://adp.serviciocivil.cl/concursos-spl/opencms/login.html" target="_blank">ADP</a></li>
+            <li><a href="https://escritorio.acepta.com/" target="_blank">Escritorio Acepta</a></li>
+            <li><a href="https://portalvu.mma.gob.cl/" target="_blank">Plataforma Gestión de desechos</a></li>
+            <li><a href="https://merieuxnutrisciences.my.site.com/login?locale=us" target="_blank">Nutriscience</a></li>
+            <li><a href="https://foodwise-food-wastage-solution.vercel.app/" target="_blank">Foodwise</a></li>
+            <li><a href="https://www.menudigitalonlineoffline.com/" target="_blank">Menu Digital ONLINE / OFFLINE</a></li>
+            <li><a href="https://qasofthsecfront.herokuapp.com/" target="_blank">QASOFT-HSEQ</a></li>
+            <li><a href="https://safe.aramarkhseq.cl/login" target="_blank">Safe.aramarkhseq.cl</a></li>
+        </ul>
+    </div>
+</div>
+<div class="cards-wrapper">
+    <div class="info-card" onclick="document.getElementById('modalNoticias').style.display='block'">
+        <img alt="Noticias Internas" class="info-card-image" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600"/>
+        <div class="info-card-footer">Noticias Internas</div>
+    </div>
+    <div class="info-card" onclick="document.getElementById('modalSoporte').style.display='block'">
+        <img alt="Soporte" class="info-card-image" src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600"/>
+        <div class="info-card-footer">Soporte</div>
+    </div>
+</div>
+<div class="modal" id="modalNoticias">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('modalNoticias').style.display='none'">×</span>
+        <h2>Noticias Internas</h2>
+        <p>Aquí encontrarás noticias internas relevantes para la organización.</p>
+    </div>
+</div>
+<div class="modal" id="modalSoporte">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('modalSoporte').style.display='none'">×</span>
+        <h2>Soporte</h2>
+        <p>Aquí puedes crear un ticket de soporte para resolver cualquier incidencia.</p>
+    </div>
+</div>
+<script>
+    const App = {};
+
+    const data = {
+        "BISE": {
+            "Operaciones Generales": {
+                "Movilidad y Reservas": [
+                    {name: "Cabify", url: "https://www.cabify.com"},
+                    {name: "Aramark Reserva", url: "https://www.aramarkreserva.com"},
+                    {name: "Getaway 24", url: "https://www.getaway24.com"}
+                ],
+                "Inventario y Punto de Venta": [
+                    {name: "APP Inventario", url: "https://www.appinventario.com"},
+                    {name: "Oracle MICROS", url: "https://www.oraclemicros.com"},
+                    {name: "BASOOM", url: "https://www.basoom.com"}
+                ],
+                "Auditorías y Visitas Operacionales": [
+                    {name: "VisitAPP y Auditoria Operacional", url: "https://www.visitappyauditoriaoperacional.com"}
+                ]
+            },
+            "Finanzas y Administración Económica": {
+                "Nómina y Compensaciones": [
+                    {name: "APP Haberes variables", url: "https://www.apphaberesvariables.com"},
+                    {name: "ADP", url: "https://adp.serviciocivil.cl/concursos-spl/opencms/login.html"}
+                ],
+                "Gastos y Rendiciones": [
+                    {name: "RindeGastos", url: "https://www.rindegastos.com/login"},
+                    {name: "Fractal", url: "https://www.fractal.com"}
+                ],
+                "Facturación Electrónica": [
+                    {name: "Escritorio Acepta", url: "https://escritorio.acepta.com/"}
+                ]
+            },
+            "Gestión de Instalaciones y Sostenibilidad": {
+                "Facilities y Mantenimiento": [
+                    {name: "Facility FIT", url: "https://www.facilityfit.io/"},
+                    {name: "LityBot", url: "https://www.litybot.com/acceso_futuro"}
+                ],
+                "Gestión de Residuos": [
+                    {name: "Plataforma Gestión de desechos", url: "https://portalvu.mma.gob.cl/"}
+                ]
+            },
+            "Nutrición, Alimentos y Servicios de Comida": {
+                "Análisis Nutricional": [
+                    {name: "Nutriscience", url: "https://merieuxnutrisciences.my.site.com/login?locale=us"},
+                    {name: "Foodwise", url: "https://foodwise-food-wastage-solution.vercel.app/"},
+                    {name: "GFF", url: "https://login.gironafilmfestival.com/"},
+                    {name: "SIMPLE SENSE", url: "https://app.simplesense.net/"}
+                ],
+                "Gestión de Suministros Alimentarios": [
+                    {name: "FoodGo", url: "https://myidentity.aramark.com/"},
+                    {name: "eFoodMax", url: "https://www.efoodmax.com/ingreso_chefs"},
+                    {name: "Rubika", url: "https://www.rubika.com"},
+                    {name: "Centro de Servicios Aramark", url: "https://portal.servicios-supply.aramark.cl"}
+                ],
+                "Menús y Recetas": [
+                    {name: "Menu Digital ONLINE / OFFLINE", url: "https://www.menudigitalonlineoffline.com"},
+                    {name: "Menú Board", url: "https://www.signmenu.com/"},
+                    {name: "Receta Escalada", url: "https://www.recetaescalada.com"}
+                ]
+            },
+            "Seguridad, Salud y Calidad": {
+                "Plataformas HSEQ Integradas": [
+                    {name: "QASOFT-HSEQ", url: "https://qasofthsecfront.herokuapp.com/"},
+                    {name: "Safe.aramarkhseq.cl", url: "https://safe.aramarkhseq.cl/login"}
+                ]
+            },
+            "Recursos Humanos y Gestión de Personal": {
+                "Autogestión y Portales Empleados": [
+                    {name: "Autogestion TI", url: "https://www.autogestionti.com"},
+                    {name: "MyWorkLife", url: "https://iam.aramark.io/"}
+                ],
+                "Planificación de Turnos y Control de Asistencia": [
+                    {name: "ShiftPlanner Pro", url: "https://www.shiftplannerpro.com"},
+                    {name: "TimeTrack", url: "https://www.timetrack.io"}
+                ]
+            }
+        },
+        "Minería": {
+            "Operaciones Generales": {
+                "Movilidad y Reservas": [
+                    {name: "Aramark Reserva", url: "https://www.aramarkreserva.com"},
+                    {name: "Cabify", url: "https://www.cabify.com"}
+                ],
+                "Auditorías y Visitas Operacionales": [
+                    {name: "VisitAPP y Auditoria Operacional", url: "https://www.visitappyauditoriaoperacional.com"}
+                ]
+            },
+            "Finanzas y Administración Económica": {
+                "Gastos y Rendiciones": [
+                    {name: "RindeGastos", url: "https://www.rindegastos.com/login"}
+                ]
+            },
+            "Gestión de Instalaciones y Sostenibilidad": {
+                "Facilities y Mantenimiento": [
+                    {name: "LityBot", url: "https://www.litybot.com/acceso_futuro"}
+                ],
+                "Gestión de Residuos": [
+                    {name: "Plataforma Gestión de desechos", url: "https://portalvu.mma.gob.cl/"}
+                ]
+            },
+            "Nutrición, Alimentos y Servicios de Comida": {
+                "Gestión de Suministros Alimentarios": [
+                    {name: "Centro de Servicios Aramark", url: "https://portal.servicios-supply.aramark.cl"}
+                ],
+                "Menús y Recetas": [
+                    {name: "Menu Digital ONLINE / OFFLINE", url: "https://www.menudigitalonlineoffline.com"}
+                ]
+            },
+            "Seguridad, Salud y Calidad": {
+                "Plataformas HSEQ Integradas": [
+                    {name: "Safe.aramarkhseq.cl", url: "https://safe.aramarkhseq.cl/login"}
+                ]
+            }
+        },
+        "Supply Chain": {
+            "Operaciones Generales": {
+                "Movilidad y Reservas": [
+                    {name: "Aramark Reserva", url: "https://www.aramarkreserva.com"}
+                ]
+            },
+            "Finanzas y Administración Económica": {
+                "Gastos y Rendiciones": [
+                    {name: "Fractal", url: "https://www.fractal.com"}
+                ]
+            },
+            "Gestión de Instalaciones y Sostenibilidad": {
+                "Facilities y Mantenimiento": [
+                    {name: "Facility FIT", url: "https://www.facilityfit.io/"}
+                ]
+            },
+            "Nutrición, Alimentos y Servicios de Comida": {
+                "Gestión de Suministros Alimentarios": [
+                    {name: "Centro de Servicios Aramark", url: "https://portal.servicios-supply.aramark.cl"},
+                    {name: "FoodGo", url: "https://myidentity.aramark.com/"}
+                ]
+            },
+            "Recursos Humanos y Gestión de Personal": {
+                "Autogestión y Portales Empleados": [
+                    {name: "MyWorkLife", url: "https://iam.aramark.io/"}
+                ]
+            }
+        }
+    };
+
+    const subcatImages = {
+        "Operaciones Generales": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600",
+        "Finanzas y Administración Económica": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600",
+        "Gestión de Instalaciones y Sostenibilidad": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600",
+        "Nutrición, Alimentos y Servicios de Comida": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600",
+        "Seguridad, Salud y Calidad": "https://images.unsplash.com/photo-1584515933487-779824d29309?w=600",
+        "Recursos Humanos y Gestión de Personal": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600"
+    };
+
+    const appIcons = {
+        "Cabify": "https://cdn-icons-png.flaticon.com/128/2504/2504820.png",
+        "Aramark Reserva": "https://cdn-icons-png.flaticon.com/128/3652/3652191.png",
+        "Getaway 24": "https://cdn-icons-png.flaticon.com/128/2990/2990507.png",
+        "APP Inventario": "https://cdn-icons-png.flaticon.com/128/3050/3050155.png",
+        "Oracle MICROS": "https://cdn-icons-png.flaticon.com/128/2920/2920277.png",
+        "BASOOM": "https://cdn-icons-png.flaticon.com/128/2920/2920349.png",
+        "VisitAPP y Auditoria Operacional": "https://cdn-icons-png.flaticon.com/128/3074/3074767.png",
+        "APP Haberes variables": "https://cdn-icons-png.flaticon.com/128/3135/3135706.png",
+        "ADP": "https://cdn-icons-png.flaticon.com/128/2910/2910791.png",
+        "RindeGastos": "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+        "Fractal": "https://cdn-icons-png.flaticon.com/128/3135/3135768.png",
+        "Escritorio Acepta": "https://cdn-icons-png.flaticon.com/128/2920/2920231.png",
+        "Facility FIT": "https://cdn-icons-png.flaticon.com/128/3659/3659899.png",
+        "LityBot": "https://cdn-icons-png.flaticon.com/128/4712/4712109.png",
+        "Plataforma Gestión de desechos": "https://cdn-icons-png.flaticon.com/128/3237/3237429.png",
+        "Nutriscience": "https://cdn-icons-png.flaticon.com/128/3480/3480822.png",
+        "Foodwise": "https://cdn-icons-png.flaticon.com/128/1046/1046784.png",
+        "GFF": "https://cdn-icons-png.flaticon.com/128/3480/3480826.png",
+        "SIMPLE SENSE": "https://cdn-icons-png.flaticon.com/128/2913/2913133.png",
+        "FoodGo": "https://cdn-icons-png.flaticon.com/128/3050/3050163.png",
+        "eFoodMax": "https://cdn-icons-png.flaticon.com/128/1046/1046857.png",
+        "Rubika": "https://cdn-icons-png.flaticon.com/128/1046/1046769.png",
+        "Centro de Servicios Aramark": "https://cdn-icons-png.flaticon.com/128/3050/3050158.png",
+        "Menu Digital ONLINE / OFFLINE": "https://cdn-icons-png.flaticon.com/128/857/857681.png",
+        "Menú Board": "https://cdn-icons-png.flaticon.com/128/3489/3489417.png",
+        "Receta Escalada": "https://cdn-icons-png.flaticon.com/128/1046/1046786.png",
+        "QASOFT-HSEQ": "https://cdn-icons-png.flaticon.com/128/3135/3135810.png",
+        "Safe.aramarkhseq.cl": "https://cdn-icons-png.flaticon.com/128/2913/2913133.png",
+        "Autogestion TI": "https://cdn-icons-png.flaticon.com/128/2910/2910791.png",
+        "MyWorkLife": "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+        "ShiftPlanner Pro": "https://cdn-icons-png.flaticon.com/128/3135/3135768.png",
+        "TimeTrack": "https://cdn-icons-png.flaticon.com/128/3135/3135810.png"
+    };
+
+    App.storage = {
+        saveData() {
+            localStorage.setItem('aramark_data', JSON.stringify(data));
+        },
+        getFavorites() {
+            return JSON.parse(localStorage.getItem('aramark_favorites') || '[]');
+        },
+        saveFavorites(favs) {
+            localStorage.setItem('aramark_favorites', JSON.stringify(favs));
+        }
+    };
+
+    App.favorites = {
+        addFavorite(name, url) {
+            const favs = App.storage.getFavorites();
+            if (!favs.find(f => f.name === name)) {
+                favs.push({name, url});
+                App.storage.saveFavorites(favs);
+            }
+        },
+        removeFavorite(name) {
+            let favs = App.storage.getFavorites();
+            favs = favs.filter(f => f.name !== name);
+            App.storage.saveFavorites(favs);
+        },
+        renderFavorites() {
+            const favs = App.storage.getFavorites();
+            const list = document.getElementById('favoritos-list');
+            if (favs.length === 0) {
+                list.innerHTML = '<li>No hay favoritos aún</li>';
+            } else {
+                list.innerHTML = favs.map(f => `<li><a href="${f.url}" target="_blank">${f.name}</a></li>`).join('');
+            }
+        }
+    };
+
+    App.rendering = {
+        renderHeader() {
+            const container = document.getElementById('area-cards-container');
+            container.style.display = 'flex';
+            container.style.flexDirection = 'row';
+            container.style.flexWrap = 'nowrap';
+            container.style.gap = '8px';
+            container.style.overflowX = 'auto';
+            container.innerHTML = Object.keys(data).map(area =>
+                `<div class="area-card" data-area="${area}">${area}</div>`
+            ).join('');
+            document.querySelectorAll('.area-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.area-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    App.ui.showArea(card.dataset.area);
+                });
+            });
+        },
+        renderAreas() {
+            const container = document.getElementById('areas-container');
+            container.innerHTML = Object.keys(data).map(area =>
+                `<div class="area-content" id="area-${area}"></div>`
+            ).join('');
+        },
+        renderSubtree(area) {
+            const areaData = data[area];
+            const container = document.getElementById(`area-${area}`);
+            let html = '<div class="subcats-grid">';
+            for (const subcat in areaData) {
+                const img = subcatImages[subcat] || 'https://via.placeholder.com/600x200';
+                html += `<div class="subcat">
+                    <img src="${img}" alt="${subcat}" class="subcat-image">
+                    <div class="subcat-header" onclick="App.ui.toggle(this.nextElementSibling)">
+                        ${subcat} <span>▼</span>
+                    </div>
+                    <div class="subcat-content">`;
+                for (const func in areaData[subcat]) {
+                    html += `<div class="func">
+                        <div class="func-header" onclick="App.ui.toggle(this.nextElementSibling)">
+                            ${func} <span>▼</span>
+                        </div>
+                        <div class="func-content">
+                            <ul class="app-list">`;
+                    areaData[subcat][func].forEach(app => {
+                        const icon = appIcons[app.name] || 'https://cdn-icons-png.flaticon.com/128/3135/3135715.png';
+                        const isFav = App.storage.getFavorites().find(f => f.name === app.name);
+                        html += `<li>
+                            <input type="checkbox" ${isFav ? 'checked' : ''} onchange="
+                                if(this.checked) {
+                                    App.favorites.addFavorite('${app.name}', '${app.url}');
+                                } else {
+                                    App.favorites.removeFavorite('${app.name}');
+                                }
+                                App.favorites.renderFavorites();
+                            ">
+                            <a href="${app.url}" target="_blank">
+                                <img src="${icon}" alt="${app.name}" class="app-icon">
+                                ${app.name}
+                            </a>
+                        </li>`;
+                    });
+                    html += `</ul></div></div>`;
+                }
+                html += `</div></div>`;
+            }
+            html += '</div>';
+            container.innerHTML = html;
+        }
+    };
+
+    App.ui = {
+        showArea(area) {
+            document.querySelectorAll('.area-content').forEach(c => c.classList.remove('active'));
+            const target = document.getElementById(`area-${area}`);
+            if (target) {
+                target.classList.add('active');
+                if (!target.innerHTML.trim()) {
+                    App.rendering.renderSubtree(area);
+                }
+            }
+        },
+        showFirstArea() {
+            const firstArea = Object.keys(data)[0];
+            document.querySelector('.area-card').classList.add('active');
+            App.ui.showArea(firstArea);
+        },
+        toggle(element) {
+            element.classList.toggle('visible');
+        },
+        showSitemap() {
+            document.getElementById('sitemap-modal').style.display = 'block';
+            document.getElementById('sitemap-tree').innerHTML = App.sitemap.generateTreeHTML(data);
+        },
+        closeSitemap() {
+            document.getElementById('sitemap-modal').style.display = 'none';
+        },
+        showAdminModal() {
+            document.getElementById('admin-modal').style.display = 'block';
+        },
+        closeAdminModal() {
+            document.getElementById('admin-modal').style.display = 'none';
+        },
+        searchApps(query) {
+            const results = [];
+            for (const area in data) {
+                for (const subcat in data[area]) {
+                    for (const func in data[area][subcat]) {
+                        data[area][subcat][func].forEach(app => {
+                            if (app.name.toLowerCase().includes(query.toLowerCase())) {
+                                results.push({area, subcat, func, app});
+                            }
+                        });
+                    }
+                }
+            }
+            const resultsDiv = document.getElementById('search-results');
+            if (query.trim() && results.length > 0) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<ul>' + results.map(r =>
+                    `<li><strong>${r.area}</strong> → ${r.subcat} → ${r.func}<br>
+                    <a href="${r.app.url}" target="_blank">${r.app.name}</a></li>`
+                ).join('') + '</ul>';
+            } else if (query.trim()) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<p>No se encontraron resultados</p>';
+            } else {
+                resultsDiv.style.display = 'none';
+            }
+        },
+        setupHeroButtons() {
+            document.getElementById('btnTutoriales').addEventListener('click', () => {
+                alert('Aquí se mostrarán los tutoriales');
+            });
+            document.getElementById('btnFavoritos').addEventListener('click', () => {
+                App.favorites.renderFavorites();
+                document.getElementById('modalFavoritos').style.display = 'block';
+            });
+            document.getElementById('btnUltimos').addEventListener('click', () => {
+                document.getElementById('modalUltimos').style.display = 'block';
+            });
+        },
+        setupTourModal() {
+            const tourShown = localStorage.getItem('tour_shown');
+            if (!tourShown) {
+                document.getElementById('tourModal').style.display = 'block';
+            }
+            document.getElementById('btnTourSi').addEventListener('click', () => {
+                alert('Iniciando tour virtual...');
+                document.getElementById('tourModal').style.display = 'none';
+                if (document.getElementById('noMostrarTour').checked) {
+                    localStorage.setItem('tour_shown', 'true');
+                }
+            });
+            document.getElementById('btnTourNo').addEventListener('click', () => {
+                document.getElementById('tourModal').style.display = 'none';
+                if (document.getElementById('noMostrarTour').checked) {
+                    localStorage.setItem('tour_shown', 'true');
+                }
+            });
+        }
+    };
+
+    App.sitemap = {
+        generateTreeHTML(data) {
+            let html = '<ul>';
+            for (const area in data) {
+                html += `<li><strong>${area}</strong><ul class="collapsible">`;
+                for (const subcat in data[area]) {
+                    html += `<li>${subcat}<ul class="collapsible">`;
+                    for (const func in data[area][subcat]) {
+                        html += `<li>${func}<ul class="collapsible">`;
+                        data[area][subcat][func].forEach(app => {
+                            html += `<li><a href="${app.url}" target="_blank">${app.name}</a></li>`;
+                        });
+                        html += `</ul></li>`;
+                    }
+                    html += `</ul></li>`;
+                }
+                html += `</ul></li>`;
+            }
+            html += '</ul>';
+            return html;
+        },
+        expandAll() {
+            document.querySelectorAll('.tree ul.collapsible').forEach(ul => ul.classList.add('visible'));
+        },
+        collapseAll() {
+            document.querySelectorAll('.tree ul.collapsible').forEach(ul => ul.classList.remove('visible'));
+        }
+    };
+
+    App.admin = {
+        addEntry() {
+            const l1 = document.getElementById('level1').value.trim();
+            const l2 = document.getElementById('level2').value.trim();
+            const l2img = document.getElementById('level2img').value.trim();
+            const l3 = document.getElementById('level3').value.trim();
+            const appName = document.getElementById('appname').value.trim();
+            const appUrl = document.getElementById('appurl').value.trim();
+            const appIcon = document.getElementById('appicon').value.trim();
+
+            if (!l1 || !l2 || !l3 || !appName || !appUrl) {
+                alert('Debes completar al menos: Nivel 1, Nivel 2, Nivel 3, Nombre App y URL App');
+                return;
+            }
+
+            if (l2img && !subcatImages[l2]) {
+                subcatImages[l2] = l2img;
+            }
+
+            if (appIcon && !appIcons[appName]) {
+                appIcons[appName] = appIcon;
+            }
+
+            if (!data[l1]) data[l1] = {};
+            if (!data[l1][l2]) data[l1][l2] = {};
+            if (!data[l1][l2][l3]) data[l1][l2][l3] = [];
+
+            const exists = data[l1][l2][l3].find(a => a.name === appName);
+            if (!exists) {
+                data[l1][l2][l3].push({name: appName, url: appUrl});
+                App.storage.saveData();
+                alert('Entrada agregada con éxito');
+                App.rendering.renderHeader();
+                App.rendering.renderAreas();
+                App.ui.showFirstArea();
+                App.admin.clearForm();
+            } else {
+                alert('La aplicación ya existe en esta ubicación');
+            }
+        },
+        deleteEntry() {
+            const l1 = document.getElementById('level1').value.trim();
+            const l2 = document.getElementById('level2').value.trim();
+            const l3 = document.getElementById('level3').value.trim();
+            const appName = document.getElementById('appname').value.trim();
+
+            if (!l1) {
+                alert('Debes especificar al menos el Nivel 1');
+                return;
+            }
+
+            if (appName && l3 && l2 && data[l1] && data[l1][l2] && data[l1][l2][l3]) {
+                data[l1][l2][l3] = data[l1][l2][l3].filter(a => a.name !== appName);
+                if (data[l1][l2][l3].length === 0) delete data[l1][l2][l3];
+            } else if (l3 && l2 && data[l1] && data[l1][l2]) {
+                delete data[l1][l2][l3];
+            } else if (l2 && data[l1]) {
+                delete data[l1][l2];
+            } else if (data[l1]) {
+                delete data[l1];
+            }
+
+            App.storage.saveData();
+            alert('Entrada eliminada con éxito');
+            App.rendering.renderHeader();
+            App.rendering.renderAreas();
+            App.ui.showFirstArea();
+            App.admin.clearForm();
+        },
+        clearForm() {
+            document.getElementById('level1').value = '';
+            document.getElementById('level2').value = '';
+            document.getElementById('level2img').value = '';
+            document.getElementById('level3').value = '';
+            document.getElementById('appname').value = '';
+            document.getElementById('appurl').value = '';
+            document.getElementById('appicon').value = '';
+            document.getElementById('apptutorial').value = '';
+        },
+        importStructure() {
+            document.getElementById('file-input').click();
+        },
+        exportStructure() {
+            const wb = XLSX.utils.book_new();
+            const rows = [['Level 1', 'Level 2', 'Level 3', 'Level 4', 'App Name', 'URL']];
+            for (const area in data) {
+                for (const subcat in data[area]) {
+                    for (const func in data[area][subcat]) {
+                        data[area][subcat][func].forEach(app => {
+                            rows.push([area, subcat, '', func, app.name, app.url]);
+                        });
+                    }
+                }
+            }
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            XLSX.utils.book_append_sheet(wb, ws, 'Estructura');
+            XLSX.writeFile(wb, 'estructura_aramark.xlsx');
+        }
+    };
+
+    App.parseExcelToData = function(json) {
+        const requiredHeaders = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'App Name', 'URL'];
+        const headers = Object.keys(json[0] || {});
+        const hasAllHeaders = requiredHeaders.every(h => headers.includes(h));
+        if (!hasAllHeaders) {
+            alert('El Excel debe tener las columnas: Level 1, Level 2, Level 3, Level 4, App Name, URL');
+            return;
+        }
+
+        const newData = {};
+        json.forEach(row => {
+            const l1 = (row['Level 1'] || '').trim();
+            const l2 = (row['Level 2'] || '').trim();
+            const l3 = (row['Level 3'] || '').trim();
+            const l4 = (row['Level 4'] || '').trim();
+            const appName = (row['App Name'] || '').trim();
+            const appUrl = (row['URL'] || '').trim();
+
+            if (!l1 || !l2 || !l4 || !appName || !appUrl) return;
+
+            const func = l4;
+            if (!newData[l1]) newData[l1] = {};
+            if (!newData[l1][l2]) newData[l1][l2] = {};
+            if (!newData[l1][l2][func]) newData[l1][l2][func] = [];
+
+            const exists = newData[l1][l2][func].find(a => a.name === appName);
+            if (!exists) {
+                newData[l1][l2][func].push({name: appName, url: appUrl});
+            }
+        });
+
+        Object.assign(data, newData);
+        App.storage.saveData();
+        alert('Estructura importada con éxito');
+        App.rendering.renderHeader();
+        App.rendering.renderAreas();
+        App.ui.showFirstArea();
+    };
+
+    App.init = function() {
+        App.rendering.renderHeader();
+        App.rendering.renderAreas();
+        App.ui.showFirstArea();
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            App.ui.searchApps(e.target.value);
+        });
+
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const bstr = evt.target.result;
+                const wb = XLSX.read(bstr, {type: 'binary'});
+                const wsname = wb.SheetNames[0];
+                const ws = wb.Sheets[wsname];
+                const json = XLSX.utils.sheet_to_json(ws);
+                App.parseExcelToData(json);
+            };
+            reader.readAsBinaryString(file);
+        });
+
+        App.ui.setupHeroButtons();
+
+        window.onclick = function(event) {
+            const modals = ['admin-modal', 'sitemap-modal', 'modalFavoritos', 'modalUltimos', 'modalNoticias', 'modalSoporte'];
+            modals.forEach(id => {
+                const modal = document.getElementById(id);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        };
+    };
+
+    document.addEventListener('DOMContentLoaded', App.init);
+</script>
+</body>
+</html>
+
